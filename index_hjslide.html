@@ -1,0 +1,131 @@
+<link rel="stylesheet" href="css/jquery.slider.css">
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<script src="js/lib/jquery-1.9.1.min.js"></script>
+<script src="js/lib/jquery.slides.js"></script>
+
+<script type="application/javascript">
+
+    var indexArray = new Array;
+
+
+    jQuery(document).ready(function($) {
+
+        $("body").html("");
+        $("body").html("<div class='slider'></div>");
+        function sliderIni(){
+            $(".slider").slidesjs({
+                width: 940,
+                height: 528,
+                navigation: {
+                    active: false,
+                    effect: "slide"
+                },
+                pagination: {
+                    active: false,
+                    // [boolean] Create pagination items.
+                    // You cannot use your own pagination. Sorry.
+                    effect: "slide"
+                    // [string] Can be either "slide" or "fade".
+                },
+                play: {
+                    active: true,
+                    // [boolean] Generate the play and stop buttons.
+                    // You cannot use your own buttons. Sorry.
+                    effect: "slide",
+                    // [string] Can be either "slide" or "fade".
+                    interval: 3000,
+                    // [number] Time spent on each slide in milliseconds.
+                    auto: true,
+                    // [boolean] Start playing the slideshow on load.
+                    // [boolean] show/hide stop and play buttons
+                    pauseOnHover: false,
+                    // [boolean] pause a playing slideshow on hover
+                    restartDelay: 2500
+                    // [number] restart delay on inactive slideshow
+                },
+                callback: {
+                    loaded: function (number) {
+                        // Do something awesome!
+                        // Passes start slide number
+                    },
+                    start: function (number) {
+                        console.log(number);
+                    },
+                    complete: function (number) {
+                        // Do something awesome!
+                        // Passes slide number at end of animation
+                    }
+                }
+            }).init();
+
+            $(".caption").fadeIn(500);
+
+            // playing with events:
+
+            $(".slider").bind("sliderChange", function(event, curSlide) {
+                $(curSlide).children(".caption").hide();
+            });
+
+            $(".slider").bind("sliderTransitionFinishes", function(event, curSlide) {
+                $(curSlide).children(".caption").fadeIn(500);
+            });
+        }
+
+        setInterval(getImages, 10000);
+
+        function getImages() {
+
+            $.ajax({
+                url: 'http://localhost/hashtag-pull-master/jsonoutput.php',
+                type: 'get',
+                async: false,
+                dataType: "json",
+                success: function(data) {
+                    $.each(data.media, function(i, item) {
+                        if(indexArray.indexOf(item.id) == -1) {
+                            console.log("pushing...." + i);
+                            var htmlcode = "";
+                            indexArray.push(item.id);
+                            //htmlcode =  '<div><div class="caption">';
+                            //htmlcode += '<a href="#">';
+                            //htmlcode += '<h4></h4>';
+                            //htmlcode += '</a>';
+                            //htmlcode += '</div>';
+                            //htmlcode += '<a href="#">';
+                            //htmlcode += '</div><img src="'+item.media_url+'" alt=""/></div>';
+                            htmlcode = '<img src="'+item.media_url+'" alt="" class="img-responsive" />';
+                            //if($(".slidesjs-control").length > 0) {
+                                //htmlcode = '<img src="'+item.media_url+'" alt="" class="img-responsive slidesjs-slide" style="position: absolute; top: 0px; left: 0px; width: 100%; z-index: 10; display: block; -webkit-backface-visibility: hidden;" slidesjs-index="' + (indexArray.length - 1) + '" />';
+                                //(".slidesjs-control").append(htmlcode);
+                           // }else{
+                                $(".slider").append(htmlcode);
+                            //}
+                            //htmlcode += '</a>';
+                            //htmlcode += '</div>';
+
+                        }
+                    });
+
+                },
+                error: function(data) {
+                    console.log("error");
+                }
+            });
+            sliderIni();
+        }
+    });
+
+
+
+</script>
+<style>
+    .caption
+    {
+        display:none;
+    }
+
+</style>
+<body>
+<div class="slider">
+</div>
+</body>

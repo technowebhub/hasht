@@ -1,0 +1,144 @@
+<link rel="stylesheet" href="css/owl.theme.css">
+<link rel="stylesheet" href="css/owl.carousel.css">
+<link rel="stylesheet" href="css/owl.transitions.css">
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<script src="js/lib/jquery-1.9.1.min.js"></script>
+<script src="js/lib/owl.carousel.js"></script>
+
+
+<script type="application/javascript">
+
+    var indexArray = new Array;
+
+
+    $(document).ready(function() {
+
+        $("#loader").css("display","block");
+        var owl = $("#owl-demo");
+        var owlData = owl.data('owlCarousel');
+
+        owl.owlCarousel({
+            jsonPath : 'http://localhost/hashtag-pull-master/jsonoutput.php',
+            jsonSuccess : customDataSuccess,
+            autoPlay : 5000,
+            stopOnHover : false,
+            navigation:false,
+            paginationSpeed : 1000,
+            goToFirstSpeed : 5000,
+            singleItem : true,
+            autoHeight : true,
+            transitionStyle:"fade",
+            rtl:true
+        });
+
+        function customDataSuccess(data){
+            var content = "";
+            for(var i in data["media"]){
+                indexArray.push(data["media"][i].id);
+                var img = data["media"][i].media_url;
+                var alt = data["media"][i].alt;
+
+                if(data["media"][i].media_url_https != undefined) {
+                    content += "<div>";
+                    content += "<video controls autoplay='autoplay' style='font-size:22px;font-family: 'Open Sans Bold', Verdana, Arial, sans-serif;'>";
+                    content += "<source src=\"" + data["media"][i].media_url_https + "\" type='video/mp4'>";
+                    content += "</video></div>";
+                    content += "</div>";
+
+
+
+                }else {
+
+                    content += "<div>";
+                    content += "<div style='font-size:22px;font-family: 'Open Sans Bold', Verdana, Arial, sans-serif;'>";
+                    content += "<b style='text-shadow: 0 0 10px white;'>" + data["media"][i].screen_name + "</b>" + ": <b style='text-shadow: 0 0 10px white;'>" + data["media"][i].text + "</b>";
+                    content += "</div>";
+                    content += "<img src=\"" +data["media"][i].media_url+ "\" alt=''  style='height:auto;padding:10px;'>";
+                    content += "</div>";
+
+                }
+
+            }
+            $("#loader").css("display","none");
+            owl.html(content);
+
+        }
+
+        setInterval(getImages, 10000);
+
+        function getImages() {
+
+            $.ajax({
+                url: 'http://localhost/hashtag-pull-master/jsonoutput.php',
+                type: 'get',
+                async: true,
+                dataType: "json",
+                success: function(data) {
+                    $.each(data.media, function(i, item) {
+                        if(indexArray.indexOf(item.id) == -1) {
+                            console.log("pushing...." + i);
+                            var htmlcode = "";
+                            indexArray.push(item.id);
+
+                            if(item.media_url_https != undefined) {
+                                htmlcode += "<div>";
+                                htmlcode += "<video controls autoplay='autoplay' style='font-size:22px;font-family: 'Open Sans Bold', Verdana, Arial, sans-serif;'>";
+                                htmlcode += "<source src=\"" + item.media_url_https + "\"  type='video/mp4'>";
+                                htmlcode += "</video></div>";
+                                htmlcode += "</div>";
+
+
+
+                            }else {
+
+                                htmlcode += "<div>";
+                                htmlcode += "<div style='font-size:22px;font-family: 'Open Sans Bold', Verdana, Arial, sans-serif;'>";
+                                htmlcode += "<b style='text-shadow: 0 0 10px white;'>" + item.screen_name + "</b>" + ": <b style='text-shadow: 0 0 10px white;'>" + item.text + "</b>";
+                                htmlcode += "</div>";
+                                htmlcode += "<img src=\"" +item.media_url+ "\" alt=''  style='height:auto;padding:10px;'>";
+                                htmlcode += "</div>";
+
+                            }
+                            owl.data('owlCarousel').addItem(htmlcode,0);
+                            //owl.data('owlCarousel').goTo(getRandomInt(0,indexArray.length));
+                        }
+
+                    });
+
+                },
+                error: function(data) {
+                    console.log("error");
+                }
+            });
+        }
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+    });
+ </script>
+<style>
+
+    #owl-demo .item{
+        background: #a1def8;
+        padding: 30px 0px;
+        display: block;
+        margin: 5px;
+        color: #FFF;
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        border-radius: 3px;
+        text-align: center;
+    }
+</style>
+<body style="background-image: url('css/images/bg2.png');">
+<div style="position:absolute; top:1px; width:100%; height:647px; background-image: url('css/images/left11.png'); background-repeat: no-repeat; float:right; z-index:10000;">
+    <div style="position:absolute; right:1px; top:1px; width:437px; height:647px;  background-image: url('css/images/right11.png'); background-repeat: no-repeat; float:left;"></div>
+</div>
+
+<p class="lead" style="font-size:60px; text-align:center; padding-bottom:0px;margin:10px;"><b><strong>#</strong>heyjayforever</p></b>
+<div id="loader" style="text-align:center;padding:0px; display:block;" ><img src="css/AjaxLoader.gif"/></div>
+<div id="owl-demo" class="owl-carousel" style="text-align:center;">
+</div>
+<div style="position:absolute; width:100%; height:150px; background-image: url('css/images/bgdown1.png');"></div>
+</body>
